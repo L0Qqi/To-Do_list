@@ -2,10 +2,21 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/L0Qqi/go_final_project/database"
+
+	_ "modernc.org/sqlite"
 )
 
 func main() {
+
+	db, err := database.InitializeDatabase()
+	if err != nil {
+		log.Fatalf("Ошибка при инициализации базы данных: %v", err)
+	}
+	defer db.Close()
 
 	webDir := "./web"
 
@@ -15,4 +26,5 @@ func main() {
 		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
 		return
 	}
+
 }
