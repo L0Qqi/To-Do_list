@@ -10,10 +10,23 @@ import (
 
 func NextDate(now time.Time, date string, repeat string) (string, error) {
 	layout := "20060102"
+	var parsedDate time.Time
+	var err error
 
-	parsedDate, err := time.Parse(layout, date)
-	if err != nil {
-		return "", fmt.Errorf("неправильный формат даты: %v", err)
+	if date == "" {
+		parsedDate = time.Now()
+	} else {
+		parsedDate, err = time.Parse(layout, date)
+		if err != nil {
+			return "", fmt.Errorf("неправильный формат даты: %v", err)
+		}
+	}
+	if repeat == "" {
+		if parsedDate.After(now) {
+			return parsedDate.Format(layout), nil
+		}
+		return time.Now().Format(layout), nil
+
 	}
 	if repeat == "y" {
 		parsedDate = parsedDate.AddDate(1, 0, 0)
@@ -31,6 +44,8 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		days, err := strconv.Atoi(repeatDate[1])
 		if err != nil || days <= 0 || days > 400 {
 			return "", fmt.Errorf("неправильное количество дней: %v", err)
+		} else if days == 1 {
+			return parsedDate.Format(layout), nil
 		}
 
 		parsedDate = parsedDate.AddDate(0, 0, days)
