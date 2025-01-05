@@ -40,8 +40,8 @@ func (app *App) taskHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut: // Обработка изменения задачи
 		app.putTaskHandler(w, r)
 
-	// case http.MethodDelete:
-	//     app.deleteTaskHandler(w, r) // Обработка удаления задачи
+	case http.MethodDelete:
+		app.deleteTaskHandler(w, r) // Обработка удаления задачи
 
 	default:
 		http.Error(w, `{"error": "Метод не поддерживается"}`, http.StatusMethodNotAllowed)
@@ -157,7 +157,7 @@ func (app *App) putTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Ошибка в проверке на : %v", err)
 	}
-	log.Printf("Rows affected: %d", rowsAffected)
+
 	if rowsAffected == 0 {
 		http.Error(w, `{"error": "Задача с указанным id не найдена или данные совпадают"}`, http.StatusNotFound)
 		return
@@ -228,6 +228,32 @@ func (app *App) getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(task); err != nil {
 		http.Error(w, fmt.Sprintf(`{"error":"Ошибка кодирования JSON: %v"}`, err), http.StatusInternalServerError)
 	}
+}
+
+func (app *App) deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, `{"error":"ID задачи не указан"}`, http.StatusBadRequest)
+		return
+	}
+
+	query := "DELETE FROM scheduler WHERE id = $1"
+
+	res, err := app.DB.Exec(query, id)
+	if err != nil {
+		http.Error(w, `{"error":"Ошибка удаления задачи"}`, http.StatusInternalServerError)
+		return
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		http.Error(w, `{"error":"Задача не найдена"}`, http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{}`))
 }
 
 func main() {
