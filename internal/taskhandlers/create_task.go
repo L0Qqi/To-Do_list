@@ -36,7 +36,7 @@ func PostTaskHandler(app *app.App) http.HandlerFunc {
 			task.Date = now.Format("20060102")
 		}
 
-		nextDate, err := nextDate.NextDate(now, task.Date, task.Repeat)
+		nextDate, err := nextDate.NextDateAdd(now, task.Date, task.Repeat)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(`{"error": "Ошибка проверки даты: %v"}`, err), http.StatusBadRequest)
 			return

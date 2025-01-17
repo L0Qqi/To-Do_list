@@ -13,12 +13,14 @@ import (
 
 func TaskDoneHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		//func (app *app.App) TaskDoneHandler(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Query().Get("id")
 
-		var task models.Task
+		if id == "" {
+			http.Error(w, `{"error":"Не указан id задачи"}`, http.StatusBadRequest)
+			return
+		}
 
+		var task models.Task
 		query := "SELECT date, repeat FROM scheduler WHERE id = $1"
 
 		err := app.DB.QueryRow(query, id).Scan(&task.Date, &task.Repeat)
@@ -31,12 +33,9 @@ func TaskDoneHandler(app *app.App) http.HandlerFunc {
 			return
 		}
 
-		flag := (task.Repeat == "")
-
-		switch flag {
-		case true:
+		// Если повторения нет, удаляем задачу
+		if task.Repeat == "" {
 			query := "DELETE FROM scheduler WHERE id = $1"
-
 			_, err := app.DB.Exec(query, id)
 			if err != nil {
 				http.Error(w, `{"error":"Ошибка удаления задачи"}`, http.StatusInternalServerError)
@@ -45,27 +44,26 @@ func TaskDoneHandler(app *app.App) http.HandlerFunc {
 
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(`{}`))
-
-		case false:
-			now := time.Now()
-			nextDate, err := nextDate.NextDate(now, task.Date, task.Repeat)
-			if err != nil {
-				http.Error(w, `{"error":"Ошибка расчета следующей даты"}`, http.StatusBadRequest)
-				return
-			}
-			query := "UPDATE scheduler SET date = $1 WHERE id = $2"
-
-			_, err = app.DB.Exec(query, nextDate, id)
-			if err != nil {
-				fmt.Printf("Ошибка обновления задачи: %v\n", err)
-				http.Error(w, `{"error":"Ошибка обновления задачи"}`, http.StatusInternalServerError)
-				return
-			}
-			fmt.Printf("Обновлённая дата сохранена в базе: %s\n", nextDate)
-
-			w.Header().Set("Content-Type", "application/json")
-
-			w.Write([]byte(`{}`))
+			return
 		}
+
+		// Рассчитываем следующую дату
+		now := time.Now()
+		nextDate, err := nextDate.NextDate(now, task.Date, task.Repeat)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"Ошибка расчета следующей даты: %v"}`, err), http.StatusBadRequest)
+			return
+		}
+
+		// Обновляем дату в базе
+		query = "UPDATE scheduler SET date = $1 WHERE id = $2"
+		_, err = app.DB.Exec(query, nextDate, id)
+		if err != nil {
+			http.Error(w, `{"error":"Ошибка обновления задачи"}`, http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{}`))
 	}
 }

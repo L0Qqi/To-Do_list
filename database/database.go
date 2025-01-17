@@ -21,14 +21,8 @@ func tableExists(db *sql.DB, tableName string) bool {
 }
 
 func InitializeDatabase() (*sql.DB, error) {
-
-	// basePath, err := os.Getwd()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
+	
 	dbFile := filepath.Join("../database", "scheduler.db")
-	//_, err = os.Stat(dbFile)
 
 	var install bool
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
