@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Проверка формат правила повторения
 func ValidateRepeat(repeat string) error {
 	if repeat == "" {
 		return nil

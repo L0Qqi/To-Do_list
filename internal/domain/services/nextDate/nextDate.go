@@ -11,7 +11,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 	layout := "20060102"
 	var parsedDate time.Time
 	var err error
-
+	//Если дата не указана, возвращаем текущую
 	if date == "" {
 		parsedDate = now
 	} else {
@@ -20,6 +20,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 			return "", fmt.Errorf("неправильный формат даты: %v", err)
 		}
 	}
+	//Если правило повторение не указано, возвращаем текущую дату
 	if repeat == "" {
 		if parsedDate.After(now) {
 			return parsedDate.Format(layout), nil
@@ -27,6 +28,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		return now.Format(layout), nil
 
 	}
+	//Обработка случая ежегодным повторением
 	if repeat == "y" {
 		parsedDate = parsedDate.AddDate(1, 0, 0)
 		for !parsedDate.After(now) {
@@ -34,7 +36,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		}
 		return parsedDate.Format(layout), nil
 	}
-
+	//Обработка случая с повторением каждые n дней
 	if strings.HasPrefix(repeat, "d ") {
 		repeatDate := strings.Split(repeat, " ")
 		if len(repeatDate) != 2 {

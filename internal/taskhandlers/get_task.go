@@ -10,6 +10,7 @@ import (
 	"github.com/L0Qqi/go_final_project/internal/domain/models"
 )
 
+// Ищем задачу по её id
 func GetTaskHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

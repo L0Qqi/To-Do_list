@@ -9,6 +9,7 @@ import (
 	"github.com/L0Qqi/go_final_project/internal/domain/models"
 )
 
+// Возвращаем весь список задач отсортированных по дате
 func GetTasksHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//func (app *App) getTasksHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,9 +39,6 @@ func GetTasksHandler(app *app.App) http.HandlerFunc {
 		response := map[string]interface{}{
 			"tasks": tasks,
 		}
-
-		jsonResponse, _ := json.MarshalIndent(response, "", "  ")
-		fmt.Println(string(jsonResponse)) // Временно для отладки
 
 		if err := json.NewEncoder(w).Encode(response); err != nil {
 			http.Error(w, fmt.Sprintf(`{"error": "Ошибка кодирования JSON: %v"}`, err), http.StatusInternalServerError)

@@ -11,21 +11,24 @@ import (
 	"github.com/L0Qqi/go_final_project/internal/domain/services/nextDate"
 )
 
+// Создание задачи
 func PostTaskHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//func (app *App) PostTaskHandler(w http.ResponseWriter, r *http.Request) {
 		var task models.Task
 
+		//Декодируем запрос
 		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 			http.Error(w, `{"error": "Ошибка в декодировании JSON"}`, http.StatusBadRequest)
 			return
 		}
-
+		//Если название пустое, вернем ошибку
 		if task.Title == "" {
 			http.Error(w, `{"error": "Поле title не может быть пустым"}`, http.StatusBadRequest)
 			return
 		}
 
+		//Парсим дату, если она есть, иначе дата будет текущей
 		now := time.Now()
 		if task.Date != "" {
 			if _, err := time.Parse("20060102", task.Date); err != nil {
@@ -36,6 +39,7 @@ func PostTaskHandler(app *app.App) http.HandlerFunc {
 			task.Date = now.Format("20060102")
 		}
 
+		//Вычисляем следующую дату
 		nextDate, err := nextDate.NextDateAdd(now, task.Date, task.Repeat)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(`{"error": "Ошибка проверки даты: %v"}`, err), http.StatusBadRequest)
@@ -43,6 +47,7 @@ func PostTaskHandler(app *app.App) http.HandlerFunc {
 		}
 		task.Date = nextDate
 
+		//Добавляем задачу в бд
 		query := "INSERT INTO scheduler (date, title, comment, repeat) VALUES ($1, $2, $3, $4)"
 
 		res, err := app.DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat)

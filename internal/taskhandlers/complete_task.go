@@ -11,6 +11,7 @@ import (
 	"github.com/L0Qqi/go_final_project/internal/domain/services/nextDate"
 )
 
+// Выполнение задачи
 func TaskDoneHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Query().Get("id")
@@ -20,6 +21,7 @@ func TaskDoneHandler(app *app.App) http.HandlerFunc {
 			return
 		}
 
+		//Считываем дату и правило повторения
 		var task models.Task
 		query := "SELECT date, repeat FROM scheduler WHERE id = $1"
 

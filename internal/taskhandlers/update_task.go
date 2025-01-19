@@ -11,11 +11,12 @@ import (
 	"github.com/L0Qqi/go_final_project/internal/domain/services"
 )
 
+// Обновляет задачу
 func PutTaskHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//func (app *App) PutTaskHandler(w http.ResponseWriter, r *http.Request) {
 		var task models.Task
-
+		//Декодируем тело запроса
 		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 			http.Error(w, `{"error": "Ошибка в декодировании JSON"}`, http.StatusBadRequest)
 			return
@@ -32,12 +33,13 @@ func PutTaskHandler(app *app.App) http.HandlerFunc {
 				return
 			}
 		}
-
+		//Проверяем правильность формата поля repeat
 		if err := services.ValidateRepeat(task.Repeat); err != nil {
 			http.Error(w, `{"error": "Неверный формат поля repeat"}`, http.StatusBadRequest)
 			return
 		}
 
+		//Обновляем задачу
 		query := "UPDATE scheduler SET date = $1, title = $2, comment = $3, repeat = $4 WHERE id = $5"
 
 		res, err := app.DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
@@ -50,7 +52,7 @@ func PutTaskHandler(app *app.App) http.HandlerFunc {
 		if err != nil {
 			log.Printf("Ошибка в проверке на : %v", err)
 		}
-
+		//Проверяет было ли затронуто 0 строк в результате запроса
 		if rowsAffected == 0 {
 			http.Error(w, `{"error": "Задача с указанным id не найдена или данные совпадают"}`, http.StatusNotFound)
 			return

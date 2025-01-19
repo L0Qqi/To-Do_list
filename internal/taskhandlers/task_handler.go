@@ -6,6 +6,7 @@ import (
 	"github.com/L0Qqi/go_final_project/internal/app"
 )
 
+// Выполняет задачу в зависимости от указанного метода
 func TaskHandler(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//func (app *App) taskHandler(w http.ResponseWriter, r *http.Request) {
