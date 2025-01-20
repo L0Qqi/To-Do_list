@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/L0Qqi/go_final_project/internal/app"
-	"github.com/L0Qqi/go_final_project/internal/domain/models"
+	"github.com/L0Qqi/To-Do_list/internal/app"
+	"github.com/L0Qqi/To-Do_list/internal/domain/models"
 )
 
 // Возвращаем весь список задач отсортированных по дате

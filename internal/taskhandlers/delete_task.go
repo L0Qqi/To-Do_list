@@ -3,7 +3,7 @@ package taskhandlers
 import (
 	"net/http"
 
-	"github.com/L0Qqi/go_final_project/internal/app"
+	"github.com/L0Qqi/To-Do_list/internal/app"
 )
 
 // func (app *App) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {

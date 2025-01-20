@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/L0Qqi/go_final_project/internal/domain/services/nextDate"
+	"github.com/L0Qqi/To-Do_list/internal/domain/services/nextDate"
 )
 
 // HandleNextDate обрабатывает запросы на вычисление следующей даты.
