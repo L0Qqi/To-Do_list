@@ -1,4 +1,4 @@
-module github.com/L0Qqi/go_final_project
+module github.com/L0Qqi/To-Do_list
 
 go 1.22.5
 

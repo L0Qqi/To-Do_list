@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/L0Qqi/go_final_project/database"
-	"github.com/L0Qqi/go_final_project/internal/app"
-	"github.com/L0Qqi/go_final_project/internal/taskhandlers"
+	"github.com/L0Qqi/To-Do_list/database"
+	"github.com/L0Qqi/To-Do_list/internal/app"
+	"github.com/L0Qqi/To-Do_list/internal/taskhandlers"
 
 	_ "modernc.org/sqlite"
 )
